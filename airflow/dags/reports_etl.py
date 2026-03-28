@@ -10,8 +10,9 @@ import psycopg2
 import requests
 from airflow.decorators import dag, task
 
+from ch_clickhouse import clickhouse_http_base, get_watermark, set_watermark
 
-CLICKHOUSE_HTTP = os.environ.get("CLICKHOUSE_HTTP", "http://clickhouse:8123")
+
 CRM_DSN = os.environ.get(
     "CRM_DSN", "postgresql://crm_user:crm_password@crm_db:5432/crm_db"
 )
@@ -19,54 +20,6 @@ TELEMETRY_DSN = os.environ.get(
     "TELEMETRY_DSN",
     "postgresql://telemetry_user:telemetry_password@telemetry_db:5432/telemetry_db",
 )
-
-
-def ch_query(sql: str) -> str:
-    resp = requests.post(f"{CLICKHOUSE_HTTP}/", params={"query": sql})
-    resp.raise_for_status()
-    return resp.text
-
-
-def ch_query_json(sql: str) -> List[Dict[str, Any]]:
-    resp = requests.post(
-        f"{CLICKHOUSE_HTTP}/",
-        params={"query": sql, "default_format": "JSONEachRow"},
-        headers={"content-type": "text/plain; charset=utf-8"},
-    )
-    resp.raise_for_status()
-    lines = [ln for ln in resp.text.splitlines() if ln.strip()]
-    return [json.loads(ln) for ln in lines]
-
-
-def get_watermark(source: str) -> datetime:
-    rows = ch_query_json(
-        f"""
-        SELECT watermark_to
-        FROM reports.etl_watermarks
-        WHERE source = {json.dumps(source)}
-        ORDER BY updated_at DESC
-        LIMIT 1
-        """
-    )
-    if not rows:
-        return datetime(1970, 1, 1, tzinfo=timezone.utc)
-    # ClickHouse returns as string, e.g. "2026-02-23 00:00:00"
-    return datetime.fromisoformat(rows[0]["watermark_to"].replace(" ", "T")).replace(
-        tzinfo=timezone.utc
-    )
-
-
-def set_watermark(source: str, watermark_to: datetime) -> None:
-    now = datetime.now(tz=timezone.utc)
-    sql = f"""
-    INSERT INTO reports.etl_watermarks (source, watermark_to, updated_at)
-    VALUES (
-      {json.dumps(source)},
-      toDateTime({json.dumps(watermark_to.strftime('%Y-%m-%d %H:%M:%S'))}),
-      toDateTime({json.dumps(now.strftime('%Y-%m-%d %H:%M:%S'))})
-    )
-    """
-    ch_query(sql)
 
 
 def pg_fetch(dsn: str, sql: str, params: Tuple[Any, ...]) -> List[Dict[str, Any]]:
@@ -218,7 +171,7 @@ def reports_etl():
         # Insert via JSONEachRow
         data = "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n"
         resp = requests.post(
-            f"{CLICKHOUSE_HTTP}/",
+            f"{clickhouse_http_base()}/",
             params={"query": "INSERT INTO reports.reporting_mart_daily FORMAT JSONEachRow"},
             data=data.encode("utf-8"),
             headers={"content-type": "application/json"},
@@ -262,4 +215,3 @@ def reports_etl():
 
 
 reports_etl()
-

@@ -120,12 +120,13 @@ services:
     volumes:
       - ./clickhouse/init:/docker-entrypoint-initdb.d:ro
       - ./clickhouse/users.d/docker-network.xml:/etc/clickhouse-server/users.d/docker-network.xml:ro
+    # SELECT 1 не гарантирует схему; без таблицы ETL получает HTTP 404 на etl_watermarks
     healthcheck:
-      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      test: ["CMD", "clickhouse-client", "--query", "SELECT count() FROM reports.etl_watermarks"]
       interval: 5s
       timeout: 5s
-      retries: 30
-      start_period: 20s
+      retries: 40
+      start_period: 45s
     depends_on:
       - kafka
 

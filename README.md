@@ -91,4 +91,5 @@ curl -s http://localhost:8001/health
 
 - Схемы ClickHouse: `clickhouse/init/`
 - DAG ETL: `airflow/dags/reports_etl.py`
+- Юнит-тесты HTTP-клиента ClickHouse (без Docker): см. **[tests/README.md](tests/README.md)** (`pip install -r airflow/requirements-dev.txt`, затем `pytest`).
 - Документация по спринту — в репозитории курса (`docs/` родительского проекта).
