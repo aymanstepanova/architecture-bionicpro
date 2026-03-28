@@ -81,6 +81,14 @@ curl -s http://localhost:8001/health
 
 Ожидается JSON с `"ok": true`.
 
+## Airflow: пример успешного `reports_etl`
+
+В UI (http://localhost:8081) откройте DAG **`reports_etl`** → вкладка **Graph**. При нормальном завершении прогона все задачи в **success** (зелёная обводка), как на скриншоте:
+
+![DAG reports_etl — все задачи success](dag.png)
+
+Цепочка: параллельно **`extract_crm_incremental`** и **`extract_telemetry_incremental`** → **`transform_join_aggregate`** → **`load_reporting_mart_clickhouse`** и **`update_watermark`** → **`data_quality_checks`**.
+
 ## Итоговая проверка: скачивание отчёта и кэш
 
 1. Убедитесь, что витрина в ClickHouse заполнена: в Airflow (http://localhost:8081) DAG `reports_etl` успешно отработал хотя бы раз. Иначе отчёт будет пустым — см. **[troubleshooting.md](troubleshooting.md)**.
