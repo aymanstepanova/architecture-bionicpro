@@ -1,0 +1,45 @@
+@startuml
+title Аутентификация: PKCE + сессия (sid), OTP, refresh и ротация sid
+
+actor "Пользователь (браузер)" as User
+participant "Frontend SPA" as Frontend
+participant "bionicpro-auth" as Auth
+participant "Keycloak (IdP/Broker + OTP)" as KC
+database "Хранилище сессий (Redis)" as Redis
+
+User -> Frontend: Нажимает «Войти»
+Frontend -> Auth: Редирект на /auth/start
+
+Auth -> Auth: Генерирует PKCE (verifier/challenge) + state
+Auth -> Redis: Сохраняет code_verifier по state (TTL 5 минут)
+
+Auth -> KC: 302 Redirect на /auth\n(code_challenge=S256, redirect_uri=/auth/callback)
+
+KC -> KC: Логин (OTP обязателен)\n(опционально: брокеринг во внешний IdP)
+
+KC -> Auth: 302 Redirect обратно\nauthorization_code + state
+
+Auth -> KC: POST /token (обмен code->tokens)\n(code_verifier используется на сервере)
+
+Auth -> Redis: Создаёт sid\nХранит access (короткий TTL) + refresh (зашифрован)
+
+Auth -> Frontend: Set-Cookie: sid=opaque\nHttpOnly; Secure; SameSite=Lax\n302 Redirect на frontend
+
+Frontend -> Auth: Запрос /me или /reports\ncredentials: include (cookie sid)
+
+Auth -> Redis: Загружает сессию по sid
+
+Auth -> KC: Если access истёк -> refresh по refresh_token
+Auth -> Redis: Обновляет токены в сессии
+
+Auth -> Redis: Ротация session id:\nсоздать новый sid, перенести, удалить старый
+Auth -> Frontend: Set-Cookie: sid=new
+
+Auth -> Frontend: 200 OK (пользователь/отчёт)\nТокены IdP во frontend не попадают
+
+note over Frontend,Auth
+Frontend работает только с cookie sid.
+IdP access/refresh токены не выдаются во frontend.
+end note
+
+@enduml
