@@ -1,0 +1,45 @@
+@startuml reports-etl-sequence
+title BionicPRO — DAG **reports_etl** (пакетный ETL в витрину)
+
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+
+actor "Планировщик\nAirflow" as Sched
+participant "Задача DAG\n(worker)" as W
+database "ClickHouse" as CH
+database "CRM\n(Postgres)" as CRM
+database "Телеметрия\n(Postgres)" as Tel
+
+== Запуск прогона ==
+Sched -> W : триггер DAG **reports_etl**
+
+== Параллельные extract (две ветки) ==
+par из CRM
+  W -> CH : **get_watermark**("crm")
+  CH --> W : watermark
+  W -> CRM : JDBC: инкремент **crm_users**\n(WHERE updated_at > wm)
+  CRM --> W : строки CRM
+else из телеметрии
+  W -> CH : **get_watermark**("telemetry")
+  CH --> W : watermark
+  W -> Tel : JDBC: инкремент **telemetry_events**\n(WHERE event_time > wm)
+  Tel --> W : строки телеметрии
+end
+
+== Трансформация (одна задача) ==
+W -> W : **transform_join_aggregate**\nагрегация по user / prosthesis / дню,\nджойн с CRM
+
+== Загрузка витрины ==
+W -> CH : HTTP **INSERT** INTO\nreports.reporting_mart_daily\nFORMAT JSONEachRow
+CH --> W : OK
+
+== Контроль и watermark ==
+W -> W : **data_quality_checks**
+W -> CH : **set_watermark**\n(telemetry, crm, reports_available_to)
+
+note over W, CH
+  Схема таблицы **reporting_mart_daily** задаётся DDL в ClickHouse;
+  DAG только наполняет витрину и обновляет служебные watermark.
+end note
+
+@enduml
