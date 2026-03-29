@@ -1,6 +1,6 @@
 @startuml assignment-3-reports-cache-flow
 skinparam ActivityFontSize 12
-title Задание 3 — поток отчёта: попадание / промах кэша
+title Задание 3 — поток отчёта: наличие / отсутствие кеша
 
 start
 :UI → Reports API: GET /reports/url?from&to;
