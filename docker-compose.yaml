@@ -1,3 +1,9 @@
+# BionicPRO — локальный стенд.
+# В этом файле и в подключаемых env заданы пароли, ключи и DSN в открытом виде: это только
+# для удобства локального запуска. В продакшене и общих стендах контейнеры должны получать
+# секреты из безопасного хранилища (Vault, секреты Kubernetes/Docker Swarm, менеджер секретов
+# облака и т.п.), а не из репозитория.
+
 version: '3.8'
 
 services:
@@ -332,6 +338,8 @@ services:
     build:
       context: ./airflow
       dockerfile: Dockerfile
+    env_file:
+      - ./airflow/reports-etl.env
     environment:
       # Одинаковый ключ на webserver и scheduler — иначе UI отдаёт 403 при чтении логов с :8793
       AIRFLOW__WEBSERVER__SECRET_KEY: "bionicpro-local-airflow-webserver-secret-key-use-long-random-in-prod"
@@ -340,9 +348,6 @@ services:
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
-      CLICKHOUSE_HTTP: http://clickhouse:8123
-      CRM_DSN: postgresql://crm_user:crm_password@crm_db:5432/crm_db
-      TELEMETRY_DSN: postgresql://telemetry_user:telemetry_password@telemetry_db:5432/telemetry_db
     volumes:
       - ./airflow/dags:/opt/airflow/dags:ro
     ports:
@@ -364,15 +369,14 @@ services:
     build:
       context: ./airflow
       dockerfile: Dockerfile
+    env_file:
+      - ./airflow/reports-etl.env
     environment:
       AIRFLOW__WEBSERVER__SECRET_KEY: "bionicpro-local-airflow-webserver-secret-key-use-long-random-in-prod"
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      CLICKHOUSE_HTTP: http://clickhouse:8123
-      CRM_DSN: postgresql://crm_user:crm_password@crm_db:5432/crm_db
-      TELEMETRY_DSN: postgresql://telemetry_user:telemetry_password@telemetry_db:5432/telemetry_db
     volumes:
       - ./airflow/dags:/opt/airflow/dags:ro
     command: bash -lc "airflow scheduler"

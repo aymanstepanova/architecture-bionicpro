@@ -62,6 +62,10 @@ docker compose down
 
 - http://localhost:8081 — `admin` / `admin`
 
+**Подключения для DAG `reports_etl`** (CRM, телеметрия, ClickHouse по HTTP) задаются в файле [`airflow/reports-etl.env`](airflow/reports-etl.env): переменные `CRM_DSN`, `TELEMETRY_DSN`, `CLICKHOUSE_HTTP`. Шаблон с теми же ключами — [`airflow/reports-etl.example.env`](airflow/reports-etl.example.env) (удобно скопировать в `reports-etl.env` при первой настройке). В `docker-compose.yaml` `reports-etl.env` подключён как `env_file` у сервисов `airflow-webserver` и `airflow-scheduler`, чтобы строки подключения не дублировались в коде DAG.
+
+Для локальных переопределений (например, другие пароли) можно завести **`airflow/reports-etl.local.env`** с теми же именами переменных и добавить второй `env_file` в compose; файл `*.local.env` в репозиторий не коммитится (см. `.gitignore`).
+
 ### MinIO (консоль)
 
 - Пользователь `minioadmin`, пароль `minioadmin123` (как в compose; для S3 в приложениях заданы через env).
@@ -158,6 +162,6 @@ end note
 ## Дополнительно
 
 - Схемы ClickHouse: `clickhouse/init/`
-- DAG ETL: `airflow/dags/reports_etl.py`
+- DAG ETL: `airflow/dags/reports_etl.py`; переменные окружения — `airflow/reports-etl.env`, шаблон — `airflow/reports-etl.example.env` (см. раздел Airflow выше)
 - Юнит-тесты HTTP-клиента ClickHouse (без Docker): см. **[tests/README.md](tests/README.md)** (`pip install -r airflow/requirements-dev.txt`, затем `pytest`).
 - Документация по спринту — в репозитории курса (`docs/` родительского проекта).

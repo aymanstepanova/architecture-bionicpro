@@ -13,13 +13,19 @@ from airflow.decorators import dag, task
 from ch_clickhouse import clickhouse_http_base, get_watermark, set_watermark
 
 
-CRM_DSN = os.environ.get(
-    "CRM_DSN", "postgresql://crm_user:crm_password@crm_db:5432/crm_db"
-)
-TELEMETRY_DSN = os.environ.get(
-    "TELEMETRY_DSN",
-    "postgresql://telemetry_user:telemetry_password@telemetry_db:5432/telemetry_db",
-)
+def _require_env(name: str) -> str:
+    try:
+        return os.environ[name]
+    except KeyError as e:
+        raise RuntimeError(
+            f"Не задана переменная окружения {name!r}. "
+            "Для Docker задайте её в airflow/reports-etl.env (шаблон: reports-etl.example.env) и env_file в compose; "
+            "локально — export или .env для вашего окружения."
+        ) from e
+
+
+CRM_DSN = _require_env("CRM_DSN")
+TELEMETRY_DSN = _require_env("TELEMETRY_DSN")
 
 
 def pg_fetch(dsn: str, sql: str, params: Tuple[Any, ...]) -> List[Dict[str, Any]]:

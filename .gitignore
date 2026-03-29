@@ -13,6 +13,7 @@
 **/.env.*.local
 bionicpro-auth/.env
 reports-api/.env
+airflow/reports-etl.local.env
 
 # Docker/infra local state
 /nginx-cache

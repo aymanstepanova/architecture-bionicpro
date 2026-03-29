@@ -3,6 +3,7 @@
 Здесь лежат:
 
 - **`dags/`** — DAG `reports_etl` и модуль [`dags/ch_clickhouse.py`](dags/ch_clickhouse.py) (HTTP-клиент ClickHouse без зависимости от Airflow).
+- **`reports-etl.example.env`** — шаблон переменных для DAG; рабочая копия — **`reports-etl.env`** (подключается в `docker-compose` как `env_file`).
 - **`Dockerfile`** — образ сервисов `airflow-webserver`, `airflow-scheduler`, `airflow-init` в `docker-compose`.
 - **`requirements.txt`** — зависимости образа.
 - **`requirements-dev.txt`** — зависимости для локального запуска тестов на хосте (pytest и т.д.).
