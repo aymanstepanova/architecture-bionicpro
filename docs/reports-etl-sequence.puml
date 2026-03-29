@@ -27,7 +27,7 @@ else из телеметрии
 end
 
 == Трансформация (одна задача) ==
-W -> W : **transform_join_aggregate**\nагрегация по user / prosthesis / дню,\nджойн с CRM
+W -> W : **transform_join_aggregate**\nагрегация по user / prosthesis / day,\njoin с CRM
 
 == Загрузка витрины ==
 W -> CH : HTTP **INSERT** INTO\nreports.reporting_mart_daily\nFORMAT JSONEachRow
