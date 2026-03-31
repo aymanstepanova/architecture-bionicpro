@@ -31,6 +31,24 @@ docker compose logs openldap --tail 80
 
 Реалм: `keycloak/realm-export.json`. Для Keycloak 21 формат компонентов без устаревших полей; при ошибках смотрите логи контейнера `keycloak` при старте.
 
+## Keycloak: OTP включён в realm, но вход проходит без `Configure OTP`
+
+Симптом: в `keycloak/realm-export.json` задан `CONFIGURE_TOTP`, но после `docker compose up` пользователь (например, `user1`) входит сразу в приложение без шага настройки OTP.
+
+Причина: импорт через `--import-realm` не всегда надёжно переназначает `requiredActions` для уже существующих пользователей. В результате политика OTP в realm есть, но у конкретных пользователей `requiredActions` может остаться пустым.
+
+Что сделать:
+
+1. Использовать одноразовый init-сервис `keycloak-init` (добавлен в `docker-compose.yaml`) — он после старта Keycloak назначает `requiredActions=["CONFIGURE_TOTP"]` для тестовых пользователей.
+2. Проверить логи и завершение init:
+   - `docker compose logs keycloak-init --tail 80`
+   - в логе ожидается `Keycloak OTP init complete.`
+3. Если нужно полностью «с нуля», пересоздать контейнеры и тома:
+   - `docker compose down -v`
+   - `docker compose up -d`
+
+Короткая проверка в UI: `http://localhost:3000` -> `Login` -> `user1/password123` -> после пароля должен открыться `Mobile Authenticator Setup` (`execution=CONFIGURE_TOTP`), а не страница отчётов.
+
 ## OpenLDAP
 
 Образ запускается с **`command: --copy-service`** и монтированием одного LDIF-файла; иначе возможны ошибки `chown` / `Device or resource busy`. При сбоях: `docker compose logs openldap`.

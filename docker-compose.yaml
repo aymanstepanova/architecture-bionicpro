@@ -41,6 +41,22 @@ services:
     depends_on:
       keycloak_db:
         condition: service_healthy
+  # применение настройки обязательного OTP, чтобы работало, если БД keycloak'а уже была создана
+  keycloak-init:
+    image: curlimages/curl:latest
+    volumes:
+      - ./keycloak/init-keycloak-otp.sh:/init/init-keycloak-otp.sh:ro
+    entrypoint: ["/bin/sh", "-c", "tr -d '\\r' < /init/init-keycloak-otp.sh | /bin/sh"]
+    environment:
+      KEYCLOAK_URL: "http://keycloak:8080"
+      KEYCLOAK_REALM: "reports-realm"
+      KEYCLOAK_ADMIN_USER: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      TARGET_USERS: "user1,user2,admin1,prothetic1,prothetic2,prothetic3"
+    depends_on:
+      keycloak:
+        condition: service_started
+    restart: "no"
 
   redis:
     image: redis:7-alpine
@@ -102,6 +118,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      keycloak-init:
+        condition: service_completed_successfully
   frontend:
     build:
       context: ./frontend
