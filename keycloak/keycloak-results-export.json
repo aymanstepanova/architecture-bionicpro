@@ -42,6 +42,7 @@
       "firstName": "User",
       "lastName": "One",
       "credentials": [{ "type": "password", "value": "password123", "temporary": false }],
+      "requiredActions": ["CONFIGURE_TOTP"],
       "realmRoles": ["user"]
     },
     {
@@ -51,6 +52,7 @@
       "firstName": "User",
       "lastName": "Two",
       "credentials": [{ "type": "password", "value": "password123", "temporary": false }],
+      "requiredActions": ["CONFIGURE_TOTP"],
       "realmRoles": ["user"]
     },
     {
@@ -60,6 +62,7 @@
       "firstName": "Admin",
       "lastName": "One",
       "credentials": [{ "type": "password", "value": "admin123", "temporary": false }],
+      "requiredActions": ["CONFIGURE_TOTP"],
       "realmRoles": ["administrator"]
     },
     {
@@ -69,6 +72,7 @@
       "firstName": "Prothetic",
       "lastName": "One",
       "credentials": [{ "type": "password", "value": "prothetic123", "temporary": false }],
+      "requiredActions": ["CONFIGURE_TOTP"],
       "realmRoles": ["prothetic_user"]
     },
     {
@@ -78,6 +82,7 @@
       "firstName": "Prothetic",
       "lastName": "Two",
       "credentials": [{ "type": "password", "value": "prothetic123", "temporary": false }],
+      "requiredActions": ["CONFIGURE_TOTP"],
       "realmRoles": ["prothetic_user"]
     },
     {
@@ -87,6 +92,7 @@
       "firstName": "Prothetic",
       "lastName": "Three",
       "credentials": [{ "type": "password", "value": "prothetic123", "temporary": false }],
+      "requiredActions": ["CONFIGURE_TOTP"],
       "realmRoles": ["prothetic_user"]
     }
   ],
