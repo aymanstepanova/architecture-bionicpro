@@ -12,7 +12,18 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the app
+# CRA вшивает REACT_APP_* только на этапе сборки (runtime environment в compose не подхватывается)
+ARG REACT_APP_API_URL=http://localhost:8000
+ARG REACT_APP_REPORTS_URL=http://localhost:8001
+ARG REACT_APP_KEYCLOAK_URL=http://localhost:8080
+ARG REACT_APP_KEYCLOAK_REALM=reports-realm
+ARG REACT_APP_KEYCLOAK_CLIENT_ID=reports-frontend
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV REACT_APP_REPORTS_URL=$REACT_APP_REPORTS_URL
+ENV REACT_APP_KEYCLOAK_URL=$REACT_APP_KEYCLOAK_URL
+ENV REACT_APP_KEYCLOAK_REALM=$REACT_APP_KEYCLOAK_REALM
+ENV REACT_APP_KEYCLOAK_CLIENT_ID=$REACT_APP_KEYCLOAK_CLIENT_ID
+
 RUN npm run build
 
 # Production stage

@@ -1,0 +1,22 @@
+@startuml assignment-3-reports-cache-flow
+skinparam ActivityFontSize 12
+title Задание 3 — поток отчёта: наличие / отсутствие кеша
+
+start
+:UI → Reports API: GET /reports/url?from&to;
+
+:Reports API вычисляет objectKey\nreports/v1/user/<user_id>/from=.../to=.../wm=<watermark>/report.csv;
+
+if (S3 HEAD: объект существует?) then (да)
+  :HIT: 200 { url: CDN_URL, cache: hit }\nбез запроса к ClickHouse;
+else (нет)
+  :MISS: выборка строк из витрины ClickHouse;
+  :Сформировать CSV → PUT объект в S3\n(Cache-Control: длинный TTL);
+  :200 { url: CDN_URL, cache: miss };
+endif
+
+:UI скачивает файл через CDN\n(Nginx proxy_cache → MinIO);
+
+stop
+
+@enduml

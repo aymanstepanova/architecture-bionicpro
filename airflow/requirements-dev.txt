@@ -1,0 +1,5 @@
+# Зависимости для локального запуска тестов (venv на хосте, Python 3.11).
+# Установка: pip install -r airflow/requirements-dev.txt
+-r requirements.txt
+pytest>=8.0,<9
+pytest-mock>=3.14,<4

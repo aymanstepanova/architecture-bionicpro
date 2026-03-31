@@ -1,0 +1,96 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 YaBrowser/26.3.0.0 Safari/537.36" version="29.6.6">
+  <diagram id="assignment-2-reports-c4" name="Page-1">
+    <mxGraphModel dx="1501" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="PTXEHmVjqJFMpRo_jMoK-1" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;color: rgb(51, 51, 51); font-weight: 400; text-align: left;&quot;&gt;BionicPRO (Software System)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="760" width="1440" x="90" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="frontendSpa" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#23A2D9;fontColor=#ffffff;strokeColor=#0E7DAD;align=center;" value="Frontend SPA&#xa;[Container]" vertex="1">
+          <mxGeometry height="80" width="220" x="520" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bionicproAuth" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1061B0;fontColor=#ffffff;strokeColor=#0D5091;align=center;" value="bionicpro-auth&#xa;[Container: session cookie]" vertex="1">
+          <mxGeometry height="90" width="260" x="321" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="sessionStore" parent="PTXEHmVjqJFMpRo_jMoK-1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#23A2D9;fontColor=#ffffff;strokeColor=#0E7DAD;align=center;" value="Хранилище сессий (Redis)&lt;br&gt;[Container]" vertex="1">
+          <mxGeometry height="90" width="200" x="351" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="reportsApi" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#23A2D9;fontColor=#ffffff;strokeColor=#0E7DAD;align=center;" value="Reports API&lt;br&gt;GET /reports&lt;br&gt;user_id из сессии" vertex="1">
+          <mxGeometry height="100" width="260" x="641" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="clickhouse" parent="PTXEHmVjqJFMpRo_jMoK-1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#23A2D9;fontColor=#ffffff;strokeColor=#0E7DAD;align=center;" value="OLAP (ClickHouse)&#xa;Reporting Mart + Watermark" vertex="1">
+          <mxGeometry height="100" width="240" x="661" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="airflow" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6C6477;fontColor=#ffffff;strokeColor=#4D4D4D;align=center;" value="Apache Airflow&lt;br&gt;[оркестрация ETL]" vertex="1">
+          <mxGeometry height="90" width="220" x="961" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="crm" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6C6477;fontColor=#ffffff;strokeColor=#4D4D4D;align=center;" value="CRM DB/API&#xa;[Source]" vertex="1">
+          <mxGeometry height="80" width="220" x="1200" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="telemetry" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6C6477;fontColor=#ffffff;strokeColor=#4D4D4D;align=center;" value="Telemetry DB&#xa;[Source]" vertex="1">
+          <mxGeometry height="80" width="220" x="961" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="frontendSpa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="bionicproAuth" value="Cookie session (sid)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="170" />
+              <mxPoint x="451" y="170" />
+            </Array>
+            <mxPoint x="621" y="210" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="bionicproAuth" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" target="sessionStore" value="sid -&amp;gt; session">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="380" />
+              <mxPoint x="420" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="frontendSpa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="reportsApi" value="Запрос отчёта&lt;div&gt;no user_id from UI&lt;/div&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="170" />
+              <mxPoint x="771" y="170" />
+            </Array>
+            <mxPoint x="621" y="210" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="reportsApi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" target="sessionStore" value="Проверка сессии&lt;br&gt;[извлечение user_id]">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="771" y="370" />
+              <mxPoint x="500" y="370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="reportsApi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" target="clickhouse" value="Чтение из витрины&lt;br&gt;(с проверкой watermark)">
+          <mxGeometry relative="1" x="0.1205" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="780" y="385" />
+              <mxPoint x="781" y="385" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="airflow" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" target="crm" value="Расписание&amp;nbsp;&lt;div&gt;DAG&lt;/div&gt;">
+          <mxGeometry relative="1" x="0.4059" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="airflow" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" target="telemetry" value="Инкрементальный&amp;nbsp;&lt;div&gt;extract&lt;/div&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="PTXEHmVjqJFMpRo_jMoK-1" source="airflow" style="rounded=0;html=1;endArrow=block;endFill=1;" target="clickhouse" value="Загрузка витрины отчетов&lt;br&gt;[обновление watermark]">
+          <mxGeometry relative="1" x="-0.0329" y="14" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" parent="PTXEHmVjqJFMpRo_jMoK-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;" value="Notes:&lt;br&gt;- Reports API читает только из витрины в ClickHouse (без тяжёлых вычислений)&lt;br&gt;- user_id берётся из session cookie (не из UI)&lt;br&gt;- Если period выходит за watermark: 409/422 + available_to" vertex="1">
+          <mxGeometry height="120" width="519" x="51" y="600" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

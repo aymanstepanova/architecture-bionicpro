@@ -1,0 +1,8 @@
+# OU для Keycloak (realm-export: usersDn / groups.dn)
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups

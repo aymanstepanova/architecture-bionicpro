@@ -1,2 +1,25 @@
 /postgres-keycloak-data
 2024__yandex-architecture-sso.code-workspace
+
+# Node / frontend artifacts
+**/node_modules/
+**/build/
+**/dist/
+**/.cache/
+**/coverage/
+
+# Local env overrides
+**/.env.local
+**/.env.*.local
+bionicpro-auth/.env
+reports-api/.env
+airflow/reports-etl.local.env
+
+# Docker/infra local state
+/nginx-cache
+/minio-data
+/postgres-*-data
+/clickhouse-data
+
+# Локальный экспорт логов Airflow из UI
+dag_id=*.log
